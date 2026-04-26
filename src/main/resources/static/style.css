@@ -28,16 +28,7 @@ body {
     background-color: #f4f4f9;
     color: #333;
 }
-  /* body {
-    background-image: url('../img/biblioteca-fundo.jpg'); 
-    background-size: cover;
-    background-attachment: fixed;
-}*/
-
-
-
-
-
+ 
 header {
     background-color: #007bff; /* Azul primário */
     color: white;
@@ -157,15 +148,36 @@ h2 {
     background-color: #8625e8 !important; /* Vermelho forte */
     
 }
-#btn-perigo{
-    background-color: #e84d5d;
-  
-
-}
+/*
 #btn-perigo:hover{
     background-color: #e71d31;
 
 }
+.btn-perigo {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-perigo:hover {
+    background-color: #c82333;
+}*/
+.form-section {
+    display: flex;
+    ustify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.form-section > div {
+    flex: 1;
+    min-width: 300px;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    }
+ 
+
 /* --- SEÇÃO DE FORMULÁRIOS E LAYOUT DE INPUTS --- */
 .form-section {
     display: flex; /* Usando flex para layout simples de 2 colunas */
@@ -342,7 +354,7 @@ select {
     white-space: pre-wrap;
 }
 
-.btn-download {
+/*.btn-download {
     background-color: #28a745;
     color: white;
     padding: 10px 20px;
@@ -352,14 +364,46 @@ select {
     font-weight: bold;
 }
 
-.btn-fechar {
+/*.btn-fechar {
     background-color: #dc3545;
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}*/
+/* Unificando botões de alerta/erro/fechar */
+.btn-perigo, .btn-fechar, #btn-perigo {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
 }
+
+.btn-perigo:hover, .btn-fechar:hover, #btn-perigo:hover {
+    background-color: #c82333;
+}
+
+/* Botões de sucesso/download */
+.btn-download, .btn-sucesso {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-download:hover, .btn-sucesso:hover {
+    background-color: #218838;
+}
+
 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 900px) {

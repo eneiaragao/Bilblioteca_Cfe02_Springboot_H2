@@ -57,6 +57,35 @@ O projeto utiliza o banco **H2** configurado para salvar os dados em um arquivo 
      - **Password:** (em branco)
 
 ---
+## ⚙️ Como Instalar e Rodar o Sistema (Versão Portátil)
+
+Para facilitar o uso na secretaria do **CEF 02**, o sistema foi configurado para rodar sem a necessidade de instalação de softwares complexos. Siga os passos abaixo:
+
+### 1. Baixe os Arquivos do Sistema
+Baixe a pasta **`deploy`** deste repositório para o seu computador. Dentro dela, você encontrará o arquivo executável (`.jar`) e o script de inicialização (`.bat`).
+
+### 2. Prepare o ambiente Java (JDK 17)
+O sistema precisa do Java 17 para funcionar. Para manter a aplicação portátil (sem precisar instalar nada no Windows), faça o seguinte:
+
+1. Baixe o Java Portátil aqui: [Download Java 17 (Adoptium/Temurin)](https://adoptium.net/pt-BR/download?link=https%3A%2F%2Fgithub.com%2Fadoptium%2Ftemurin17-binaries%2Freleases%2Fdownload%2Fjdk-17.0.18%252B8%2FOpenJDK17U-jdk_x64_windows_hotspot_17.0.18_8.zip&vendor=Adoptium)
+2. Extraia o conteúdo do arquivo `.zip` baixado.
+3. **Importante:** Renomeie a pasta extraída para apenas `java`.
+4. Mova essa pasta `java` para dentro da pasta `deploy` do projeto.
+
+### 3. Estrutura de Pastas Correta
+
+Para que o sistema funcione, a organização dos arquivos na sua máquina deve ser exatamente esta:
+
+```text
+📂 deploy
+ ├── 📂 java                <-- Pasta do Java que você baixou e renomeou
+ │    └── 📂 bin
+ │         └── 📄 java.exe
+ ├── 📄 cef02-0.0.1-SNAPSHOT.jar
+ └── 📄 iniciar_sistema.bat  <-- Clique aqui para abrir o sistema
+```
+
+---
 
 ## 👨‍💻 Desenvolvedor
 
@@ -66,3 +95,4 @@ O projeto utiliza o banco **H2** configurado para salvar os dados em um arquivo 
 > "Este projeto representa a aplicação prática dos conhecimentos acadêmicos em um cenário real, contribuindo para a organização da biblioteca do CEF 02 - Arapoanga durante meu estágio supervisionado."
 
 ---
+

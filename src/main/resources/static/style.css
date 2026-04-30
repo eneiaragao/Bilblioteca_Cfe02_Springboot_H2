@@ -1,9 +1,9 @@
 /* style.css (Versão Otimizada) */
 
 /* --- CONFIGURAÇÕES GERAIS --- */
- 
-
-
+ :root {
+    --c-blue: #17a2b8; /* Azul Claro / Info */
+} 
 
 /* --- Estilos para a Imagem de Fundo  sugestão a ser implementada--- */
 body {
@@ -130,7 +130,7 @@ h2 {
     cursor: pointer;
     font-size: 1em;
     font-weight: bold;
-    background-color: #17a2b8; /* Azul Claro/Info para Consultas */
+    background-color: var(--c-blue); /* Azul Claro/Info para Consultas */
     color: white;
     transition: background-color 0.2s;
 }
@@ -141,28 +141,27 @@ h2 {
 
 /* Destaque vermelho para Livros em Atraso */
 #btn-emprestimos-atrasados-consulta {
-    background-color: #2c47cc !important; /* Vermelho forte */
+    background-color: var(--c-blue) !important; 
     color: white !important;
 }
 #btn-emprestimos-atrasados-consulta:hover{
     background-color: #8625e8 !important; /* Vermelho forte */
     
 }
-/*
-#btn-perigo:hover{
-    background-color: #e71d31;
-
+#btn-lista-usuarios{
+    background-color: var(--c-blue); 
+    color: white ;
 }
-.btn-perigo {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    cursor: pointer;
+#btn-sair{
+
+background-color: red !important;  
+color: white;
+}
+#btn-sair:hover{
+    background-color: var(--c-blue); 
+color: white;
 }
 
-.btn-perigo:hover {
-    background-color: #c82333;
-}*/
 .form-section {
     display: flex;
     ustify-content: space-between;

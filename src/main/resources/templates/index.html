@@ -34,6 +34,10 @@
 </head>
 
 <body>
+
+   
+
+
 <header class="cabecalho-principal">
     <div class="logo-e-titulo"> 
         <img src="/img/cf2.jpeg.jpeg" alt="Logotipo da Biblioteca CEF 02 DO ARAPOANGA"> 
@@ -57,6 +61,8 @@
         <button id="btn-emprestimos-ativos-consulta">Empréstimos Ativos (No Prazo)</button>
         <button id="btn-emprestimos-atrasados-consulta">Empréstimos Vencidos (Atrasados)</button>
         <button id="btn-historico-locacoes">Histórico Completo de Locações</button>
+        <button id="btn-lista-usuarios">Lista de Usuários</button>
+        <button id="btn-sair" >Fechar Sistema</button>
     </div>
     
     <div class="form-section">
@@ -76,7 +82,7 @@
                     <input type="number" id="ano_publicacao" required>
                 </div>
                 <div class="form-group">
-                    <label for="isbn">ISBN:</label>
+                    <label for="isbn">Código do Livro :</label>
                     <input type="text" id="isbn" required>
                 </div>
                 <div class="form-group">
@@ -236,7 +242,7 @@
                         <th style="padding: 12px; border: 1px solid #ddd; width: 50px;">ID</th>
                         <th style="padding: 12px; border: 1px solid #ddd;">TÍTULO</th>
                         <th style="padding: 12px; border: 1px solid #ddd;">AUTOR</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">ISBN</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">CODIGO DO ALUNO</th>
                         <th style="padding: 12px; border: 1px solid #ddd; width: 120px;">DISP/TOTAL</th>
                     </tr>
                 </thead>

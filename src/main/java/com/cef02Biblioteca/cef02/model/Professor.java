@@ -6,7 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Data
+@Data // Esta anotação já gera os Gets e Sets automaticamente!
 public class Professor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +14,7 @@ public class Professor {
     
     private String nome;
     private String telefone;
+    private String matricula;
 
     // Adicione este bloco:
     @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -197,6 +197,179 @@ if (inputBusca) {
     });
 }
 
+///////////////////////////////////////
+/**
+ * 1. LOGICA DE VINCULAÇÃO (Coloque dentro do seu document.addEventListener('DOMContentLoaded', ...))
+ */
+const btnListaUsuarios = document.getElementById('btn-lista-usuarios');
+if (btnListaUsuarios) {
+    btnListaUsuarios.addEventListener('click', function() {
+        consultarListaUsuarios();
+    });
+}
+
+
+/**
+ * 2. FUNÇÃO PARA BUSCAR DADOS E EXIBIR NO MODAL
+ */
+async function consultarListaUsuarios() {
+    try {
+        console.log("Iniciando busca de usuários...");
+        
+        // Busca alunos e professores ao mesmo tempo
+        const [resAlunos, resProfs] = await Promise.all([
+            fetch(`${API_BASE_URL}/alunos`),
+            fetch(`${API_BASE_URL}/professores`)
+        ]);
+
+        if (!resAlunos.ok || !resProfs.ok) throw new Error("Erro ao buscar dados da API");
+
+        const alunos = await resAlunos.json();
+        const profs = await resProfs.json();
+
+        const modal = document.getElementById('modalHistorico');
+        const corpo = document.getElementById('corpoTabelaHistorico');
+        const thead = modal.querySelector('thead');
+        const tituloModal = modal.querySelector('h2');
+
+        // Configura o título e cabeçalho da tabela no Modal
+        tituloModal.innerText = "👥 LISTA GERAL DE USUÁRIOS (ALUNOS E PROFS)";
+        thead.innerHTML = `
+            <tr style="background: #2c3e50; color: white;">
+                <th style="padding: 10px; border: 1px solid #ddd;">TIPO</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">MATRÍCULA</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">NOME COMPLETO</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">CONTATO</th>
+            </tr>`;
+
+        corpo.innerHTML = "";
+
+        // Une as duas listas, priorizando a matrícula para Alunos
+const listaUnificada = [
+    ...alunos.map(a => ({ 
+        tipo: 'ALUNO', 
+        // Aqui está a mudança: se houver matrícula, usa ela. Caso contrário, usa o ID.
+        identificador: a.matricula || a.idAluno, 
+        nome: a.nome, 
+        tel: a.telefone 
+    })),
+    ...profs.map(p => ({ 
+        tipo: 'PROFESSOR', 
+        // Para professores, geralmente mantemos o ID ou código funcional
+        identificador: p.matricula || p.idProfessor,
+        nome: p.nome, 
+        tel: p.telefone 
+    }))
+];
+
+        // Ordena por nome de A-Z
+        listaUnificada.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        // Preenche a tabela no HTML
+        listaUnificada.forEach((u, index) => {
+    const corFundo = index % 2 === 0 ? "#ffffff" : "#f9f9f9";
+    corpo.innerHTML += `
+        <tr style="background-color: ${corFundo};">
+            <td style="padding: 8px; border: 1px solid #ddd; text-align:center;"><strong>${u.tipo}</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align:center;">${u.identificador}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${u.nome.toUpperCase()}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align:center;">${u.tel || '(61) ----'}</td>
+        </tr>`;
+});
+        // VINCULA O BOTÃO DE PDF DO MODAL PARA A FUNÇÃO DE USUÁRIOS
+        const btnPdf = modal.querySelector('.btn-download'); 
+        if(btnPdf) btnPdf.onclick = () => gerarRelatorioUsuariosPDF();
+
+        modal.style.display = "block";
+
+    } catch (error) {
+        console.error("Erro técnico:", error);
+        alert("Não foi possível carregar a lista de usuários.");
+    }
+}
+
+
+/**
+ * 3. FUNÇÃO PARA GERAR O PDF (PADRÃO DE QUADROS CINZAS)
+ */
+const gerarRelatorioUsuariosPDF = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const margemX = 20;
+    let y = 55;
+
+    // Cabeçalho Azul Escuro (Padrão CEF 02)
+    doc.setFillColor(44, 62, 80);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.text("RELATÓRIO GERAL DE USUÁRIOS", 105, 20, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Biblioteca CEF 02 - Emitido em: ${new Date().toLocaleString('pt-BR')}`, 105, 30, { align: "center" });
+
+    const limparTexto = (t) => t.replace(/[👥🆔📱🎓👨‍🏫]/g, '').replace(/\s\s+/g, ' ').trim();
+
+    // Função interna para desenhar os quadros (baseada na sua lógica original)
+    const desenharQuadrosUsuarios = (titulo, seletorTabela, corRGB) => {
+        const linhasTabela = document.querySelectorAll(`${seletorTabela} tr`);
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(corRGB[0], corRGB[1], corRGB[2]);
+        doc.text(titulo, margemX, y);
+        y += 8;
+        
+        doc.setDrawColor(corRGB[0], corRGB[1], corRGB[2]);
+        doc.line(margemX, y, 190, y);
+        y += 10;
+
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "normal");
+
+        if (linhasTabela.length === 0) {
+            doc.text("Nenhum usuário encontrado para exportação.", margemX + 5, y);
+            y += 15;
+        } else {
+            linhasTabela.forEach(linha => {
+                const colunas = linha.querySelectorAll("td");
+                if(colunas.length > 0) {
+                    // Monta o texto do quadro: TIPO | NOME | ID | CONTATO
+                    const info = `${colunas[0].innerText} | ${colunas[2].innerText} | MATRÍCULA/ID: ${colunas[1].innerText} | Contato: ${colunas[3].innerText}`;
+                    const textoLimpo = limparTexto(info);
+                    const textoFormatado = doc.splitTextToSize(textoLimpo, 160);
+                    const alturaRetangulo = (textoFormatado.length * 7) + 6;
+
+                    // Desenha o quadro cinza
+                    doc.setDrawColor(200, 200, 200);
+                    doc.rect(margemX, y - 5, 170, alturaRetangulo);
+                    doc.text(textoFormatado, margemX + 5, y + 2);
+                    
+                    y += alturaRetangulo + 5;
+
+                    // Nova página se necessário
+                    if (y > 270) { 
+                        doc.addPage(); 
+                        y = 25; 
+                    }
+                }
+            });
+        }
+    };
+
+    // Executa o desenho usando o corpo da tabela que preenchemos no modal
+    desenharQuadrosUsuarios("LISTAGEM DE ALUNOS E PROFESSORES", "#corpoTabelaHistorico", [44, 62, 80]);
+
+    // Rodapé
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text("Documento gerado pelo Sistema de Gestão de Biblioteca - Eneias Aragão", 105, 290, { align: "center" });
+
+    doc.save(`Lista_Usuarios_CEF02_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+}
+
+///////////////////////////////////////////////////
+
 // Função que faz a mágica da busca
 async function executarBuscaDinamica(termo) {
     const divResultado = document.getElementById('resultadoBusca');
@@ -375,25 +548,37 @@ async function consultarHistoricoCompleto() {
 
         const modal = document.getElementById('modalHistorico');
         const corpo = document.getElementById('corpoTabelaHistorico');
-          const tituloModal = modal.querySelector('h2'); // Captura o título do modal
+        const thead = modal.querySelector('thead'); // Captura o cabeçalho
 
-        // --- ADICIONE ESTA LINHA ---
-        tituloModal.innerText = "📜 HISTÓRICO DE LOCAÇÕES - CEF 02";
+        // --- CORREÇÃO DO CABEÇALHO ---
+        thead.innerHTML = `
+            <tr style="background: #2ecc71; color: white;">
+                <th style="padding: 10px; border: 1px solid #ddd;">ID</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">TÍTULO DO LIVRO</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">NOME DO USUÁRIO</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">DATA PRAZO</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">STATUS</th>
+            </tr>`;
+
+        corpo.innerHTML = "";
+
         if (listaTotal.length === 0) {
-            alert("Não há registros de locações ativas ou atrasadas.");
+            alert("Não há registros de locações.");
             return;
         }
 
         listaTotal.forEach((emp, index) => {
             const isAtrasado = atrasados.some(atr => atr.id === emp.id);
             const corFundo = index % 2 === 0 ? "#ffffff" : "#f9f9f9";
-            const usuario = emp.aluno ? `${emp.aluno.nome} (ALUNO)` : `${emp.professor.nome} (PROF)`;
+            
+            // Identifica se é Aluno ou Professor para pegar o nome
+            const nomeUsuario = emp.aluno ? `${emp.aluno.nome} (ALUNO)` : `${emp.professor.nome} (PROF)`;
             
             corpo.innerHTML += `
                 <tr style="background-color: ${corFundo};">
                     <td style="padding: 8px; border: 1px solid #ddd; text-align:center;">${emp.id}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;"><strong>${emp.livro.titulo.toUpperCase()}</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${usuario}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${nomeUsuario}</td>
                     <td style="padding: 8px; border: 1px solid #ddd; text-align:center;">${emp.dataDevolucaoPrevista}</td>
                     <td style="padding: 8px; border: 1px solid #ddd; text-align:center; color: ${isAtrasado ? 'red' : 'green'}; font-weight:bold;">
                         ${isAtrasado ? '⚠️ ATRASADO' : '✅ NO PRAZO'}
@@ -406,6 +591,7 @@ async function consultarHistoricoCompleto() {
         alert("Erro ao carregar histórico.");
     }
 }
+
 
 async function gerarRelatorioHistoricoPDF() {
     const { jsPDF } = window.jspdf;
@@ -553,10 +739,10 @@ async function cadastrarUsuario(event) {
     const matricula = document.getElementById('matricula_aluno').value;
     const telefone = document.getElementById('contato_usuario_novo').value;
 
-    const usuario = { nome, telefone };
+    const usuario = { nome, telefone, matricula};
     let rota = tipo === 'aluno' ? '/alunos' : '/professores';
-    if (tipo === 'aluno') usuario.matricula = matricula;
-
+    //if (tipo === 'aluno') usuario.matricula = matricula;
+// Removi o "if (tipo === 'aluno')" que estava bloqueando o professor
     try {
         const response = await fetch(`${API_BASE_URL}${rota}`, {
             method: 'POST',
@@ -848,3 +1034,28 @@ async function gerarRelatorioPDF() {
 
     doc.save(`Relatorio_Biblioteca_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
 }
+
+// Aguarda o carregamento completo da página
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const botaoSair = document.getElementById('btn-sair');
+
+    if (botaoSair) {
+        botaoSair.addEventListener('click', function() {
+            if (confirm("Deseja realmente fechar a aplicação e salvar os dados?")) {
+                
+                fetch('/api/system/shutdown', {
+                    method: 'POST'
+                })
+                .then(response => {
+                    alert("Comando de fechamento enviado. O terminal fechará em instantes.");
+                    window.close();
+                })
+                .catch(err => {
+                    console.error("Erro ao fechar:", err);
+                    alert("O servidor já foi desligado ou está inacessível.");
+                });
+            }
+        });
+    }
+});
